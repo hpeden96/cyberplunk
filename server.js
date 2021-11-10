@@ -18,6 +18,8 @@ io.on('connection', (socket) => {
 
     socket.emit('previous messages', { messageHistory, room });
 
+    socket.emit('startUserCreation');
+
     const user = userJoin(socket.id, username, room);
 
     socket.join(user.room);
