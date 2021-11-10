@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
 
     socket.emit('startUserCreation');
 
-    const user = userJoin(socket.id, username, room);
+    const user = userJoin(socket.id, username, room, false, null, getRandomInt(100), null, 0);
 
     socket.join(user.room);
 
@@ -32,6 +32,27 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', (msg) => {
     const user = getCurrentUser(socket.id);
+
+    if (!user.characterCreated){
+      if(["solo", "medtech", "netrunner"].includes(msg.toLowerCase())){
+        user.role = msg.toLowerCase();
+        if (user.role === "solo"){
+          user.health += 20;
+          user.unlockChance = 20
+        }
+        else if (user.role === "medtech"){
+          user.health += 30;
+          user.unlockChance = 40
+        }
+        else if (user.role === "netrunner"){
+          user.health += 10
+          user.unlockChance = 90
+        }
+        user.characterCreated = true;
+      }
+      console.log(user);
+    }
+
     messageHistory.push({ ...formatMessage(user.username, msg), messageRoom: user.room })
     io.to(user.room).emit('chat message', formatMessage(user.username, msg));
   });
@@ -46,6 +67,10 @@ io.on('connection', (socket) => {
     }
   })
 })
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 
 server.listen(PORT, () => {
   console.log(`listening on ${ PORT }`);

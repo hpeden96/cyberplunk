@@ -51,7 +51,7 @@ socket.on('previous messages', function(data) {
 socket.on('startUserCreation', () => {
     var item = document.createElement('div');
     item.classList.add('message');
-    item.innerHTML = `<p class="meta">Server</p><p class="text">Please enter the option</p>`;
+    item.innerHTML = `<p class="meta">Server</p><p class="text">Please enter your class</p>`;
     document.getElementById("messages").appendChild(item);
 })
 
