@@ -6,10 +6,12 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const path = require('path');
 const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users');
+const { randEncounter } = require('./utils/encounter');
 const { formatMessage } = require('./utils/messages');
 const PORT = process.env.PORT || 5000;
 
 const messageHistory = [];
+usersReady = false;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -18,7 +20,7 @@ io.on('connection', (socket) => {
 
     socket.emit('previous messages', { messageHistory, room });
 
-    socket.emit('startUserCreation');
+    socket.emit('chat message', formatMessage('Server', 'Please enter your class'));
 
     const user = userJoin(socket.id, username, room, false, null, getRandomInt(100), null, 0);
 
@@ -28,6 +30,27 @@ io.on('connection', (socket) => {
       room: user.room,
       users: getRoomUsers(user.room)
     });
+  })
+
+  socket.on('game started', (room) => {
+    //console.log(`game started in ${room}`);
+    roomUsers = getRoomUsers(room);
+    roomUsersIds = roomUsers.map(oof => oof.id);
+    //console.log(roomUsersIds);
+
+    usersReady = true;
+    roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
+    if(usersReady){
+      encounter = randEncounter();
+      io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
+
+      encounterRunning = true;
+      
+      if (encounterRunning){
+        thisPersonsTurn = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+        console.log(thisPersonsTurn);
+      }
+    }
   })
 
   socket.on('chat message', (msg) => {
@@ -50,7 +73,11 @@ io.on('connection', (socket) => {
         }
         user.characterCreated = true;
       }
-      console.log(user);
+      //console.log(user);
+    }
+
+    if(usersReady){
+      console.log('users running');
     }
 
     messageHistory.push({ ...formatMessage(user.username, msg), messageRoom: user.room })

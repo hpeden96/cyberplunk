@@ -48,13 +48,6 @@ socket.on('previous messages', function(data) {
     });
 })
 
-socket.on('startUserCreation', () => {
-    var item = document.createElement('div');
-    item.classList.add('message');
-    item.innerHTML = `<p class="meta">Server</p><p class="text">Please enter your class</p>`;
-    document.getElementById("messages").appendChild(item);
-})
-
 socket.on('roomUsers', ({ room, users }) => {
     roomHeader.innerText = `Users In ${room}`;
     roomHeaderOffcanvas.innerText = `Users In ${room}`;
@@ -62,6 +55,10 @@ socket.on('roomUsers', ({ room, users }) => {
     userListOffcanvas.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
     userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
 })
+
+function startGame(){
+    socket.emit('game started', room);
+}
 
 function cringe(){
     bsOffCanvasMenu.toggle();
