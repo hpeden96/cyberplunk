@@ -26,8 +26,8 @@ io.on('connection', (socket) => {
     socket.emit('previous messages', { messageHistory, room });
 
     socket.emit('chat message', formatMessage('Server', 'Please enter your class and type "start" to start the game when everyone is ready'));
-
-    const user = userJoin(socket.id, username, room, false, null, getRandomInt(100), null, 0);
+    healths = getRandomInt(100);
+    const user = userJoin(socket.id, username, room, false, null, healths, healths, null);
 
     socket.join(user.room);
 
@@ -49,15 +49,15 @@ io.on('connection', (socket) => {
         user.role = msg.toLowerCase();
         if (user.role === "solo"){
           user.health += 20;
-          user.unlockChance = 20
+          user.maxhealth += 20;
         }
         else if (user.role === "medtech"){
           user.health += 30;
-          user.unlockChance = 40
+          user.maxhealth += 30;
         }
         else if (user.role === "netrunner"){
           user.health += 10
-          user.unlockChance = 90
+          user.maxhealth += 10;
         }
         user.characterCreated = true;
       }
@@ -76,6 +76,10 @@ io.on('connection', (socket) => {
     roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
 
     if(msg === "start" && usersReady){
+      io.to(room).emit('userdata', {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      });
       gameRunning = true;
     }
     else if (msg === "start" && !usersReady){
