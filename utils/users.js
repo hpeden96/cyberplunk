@@ -22,9 +22,4 @@ function getRoomUsers(room){
     return users.filter(user => user.room === room);
 }
 
-//function rollInitiative(){
-//    return Math.floor(Math.random() * 20)
-//}
-
-
 module.exports = { userJoin, getCurrentUser, userLeave, getRoomUsers }
