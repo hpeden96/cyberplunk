@@ -1,5 +1,3 @@
-startingWeapon = { name: "Pipe Wrench", min: 5, max: 10}
-
 weapon01 = { name: "Katana", min: 10, max: 15}
 
 weapon02 = { name: "LIZZIE(Desert Eagle)", min: 14, max: 17}
@@ -16,7 +14,7 @@ function randLoot() {
 }
 
 function getStartingWeapon() {
-    return startingWeapon    
+    return startingWeapon = { name: "Pipe Wrench", min: 5, max: 10}    
 }
 
 module.exports = { randLoot, getStartingWeapon}
