@@ -108,7 +108,7 @@ io.on('connection', (socket) => {
             currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
             currentPerson = getCurrentUser(currentPersonID);
           }
-          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username} what will you do?`));
+          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username}, what will you do?`));
         }
         else{
           io.to(room).emit('chat message', formatMessage("server", `You won! Type something to continue..`));
