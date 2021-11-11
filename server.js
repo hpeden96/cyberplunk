@@ -9,6 +9,7 @@ const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/u
 const { randEncounter } = require('./utils/encounter');
 const { formatMessage } = require('./utils/messages');
 const e = require('cors');
+const { getStartingWeapon } = require('./utils/weapons');
 const PORT = process.env.PORT || 5000;
 
 const messageHistory = [];
@@ -27,7 +28,7 @@ io.on('connection', (socket) => {
 
     socket.emit('chat message', formatMessage('Server', 'Please enter your class and type "start" to start the game when everyone is ready'));
     healths = getRandomInt(100);
-    const user = userJoin(socket.id, username, room, false, null, healths, healths, null);
+    const user = userJoin(socket.id, username, room, false, null, healths, healths, getStartingWeapon());
 
     socket.join(user.room);
 
@@ -61,7 +62,7 @@ io.on('connection', (socket) => {
         }
         user.characterCreated = true;
       }
-      //console.log(user);
+      //console.log(user) 
     }
 
     // game logic
