@@ -1,0 +1,118 @@
+* {
+  font-family: 'Tomorrow', sans-serif;
+}
+
+body {
+  background-color: #171e3a;
+  height: 100%;
+  background-image: linear-gradient(to bottom right, #000000, #383838);
+  /* background-image: radial-gradient(#171e3a, #d883e4, #5994ce); */
+  /* background-image: conic-gradient(#d883e4, #171e3a, #5994ce); */
+  background-position: center 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  -webkit-background-size: cover;
+  -o-background-size: cover;
+  -moz-background-size: cover;
+  -ms-background-size: cover;
+}
+
+.container {
+  display: block;
+  /* margin-top: 200px; */
+  margin-top: 200px;
+}
+
+form {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  background-image: radial-gradient(#171e3a, #5994ce);
+}
+.form-control {
+  font-size: larger;
+  margin-bottom: 20px;
+  color: #d883e4;
+  padding: 15px;
+  background-color: #171e3a;
+  border: #27255f;
+  box-shadow: 0px 5px 6px 1px #71b8ff;
+}
+#username::placeholder {
+  color: #5994ce;
+}
+#room {
+  color: #5994ce;
+}
+input,
+select,
+button {
+  border-radius: 5px;
+}
+/* .submitButton {
+  font-size: larger;
+  background: white;
+  position: relative;
+  padding: 5px 20px 5px 20px;
+  color: #5994ce;
+} */
+
+/* animation test */
+
+.submitButton {
+  font-weight: bold;
+  text-transform: uppercase;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  position: absolute;
+  left: 0%;
+  top: 10%;
+  position: relative;
+  transform: translate(-1%, -1%);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0.8em 1.6em;
+  font-size: 18px;
+  overflow: hidden;
+}
+:focus,
+:active {
+  outline: none;
+}
+::before,
+::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  width: auto;
+  z-index: -1;
+  border-radius: inherit;
+  background: inherit;
+}
+::before {
+  background: linear-gradient(90deg, #0ebeff, #ae63e4, #47cf73);
+  background-size: 200% 200%;
+}
+::after {
+  margin: 3px;
+}
+:hover:before,
+:focus:before {
+  animation: rainbow-border 1.5s linear infinite;
+}
+
+@keyframes rainbow-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
