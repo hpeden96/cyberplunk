@@ -10,18 +10,13 @@ weapon04 = { name: "OVERWATCH Sniper", min: 40, max: 55}
 
 randWeapons = [ weapon01, weapon02, weapon03, weapon04 ]
 
-function randLoot(randWeapons) {
+function randLoot() {
     rand = Math.floor(Math.random() * (randWeapons.length))
     return randWeapons[rand]
-    //console.log("Name: " + randWeapons[rand].name + "\nDamage: " + randWeapons[rand].min + "-" + randWeapons[rand].max)
 }
 
-function getStartingWeapon(startingWeapon) {
-    return startingWeapon
-    console.log("Name: " + startingWeapon.name + "\nDamage: " + startingWeapon.min + "-" + startingWeapon.max)
+function getStartingWeapon() {
+    return startingWeapon    
 }
-
-//randLoot(randWeapons)
-//getStartingWeapon(startingWeapon)
 
 module.exports = { randLoot, getStartingWeapon}

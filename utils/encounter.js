@@ -1,6 +1,5 @@
 
-//isSkillOrCombat 1 - skill, 0 - combat
-isSkillOrCombat: 1}or
+//isSkillOrCombat 1 - skill challange, 0 - combat
 
 randEnc1 = { name:"Gang Members Attack", description:"You've being jumped by gansters.  Roll initiative!" , 
                     isSkillOrCombat:0, enemyName: "Gansters", hp:50, minAttack: 10, maxAttack: 20}
@@ -30,9 +29,15 @@ randEnc6 = { name:"Looting from cars", description: "You walk past a car that lo
                     isSkillOrCombat: 1
                 }
 
-randomEncounters = [ randEnc1, randEnc2, randEnc3, randEnc4, randEnc5, randEnc6 ]
+randEnc7 = { name:"Treasure Chest!", description: "The party has found an abandoned weapons crate that is sealed with by electronic lock.  You decide to test your hacking skills and try to get it open.",
+                    DC:13,
+                    passOutcome: "You open it with ease and you find a weapon.",
+                    failOutcom: "You struggle to find the encryption key.  You kick the crate out of frustration and decide to leave it be.",
+                    isSkillOrCombat: 1}
 
-function randEncounter(randomEncounters) {
+randomEncounters = [ randEnc1, randEnc2, randEnc3, randEnc4, randEnc5, randEnc6, randEnc7 ]
+
+function randEncounter() {
     randEncRoll = Math.floor(Math.random() * (randomEncounters.length))
     return randomEncounters[randEncRoll]
 }
