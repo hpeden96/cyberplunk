@@ -108,7 +108,7 @@ io.on('connection', (socket) => {
             currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
             currentPerson = getCurrentUser(currentPersonID);
           }
-          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username} what will you do?`));
+          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username}, what will you do?`));
         }
         else{
           io.to(room).emit('chat message', formatMessage("server", `You won! Type something to continue..`));
@@ -141,7 +141,13 @@ function getRandomInt(max) {
 function gameSetup(room){
   encounter = randEncounter();
   io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
-  enemyHP = 30;
+  if (encounter.isSkillOrCombat == 0){
+    enemyHP = encounter.hp;
+    console.log('enemy hp ' + enemyHP);
+  }
+  else{
+    enemyHP = 1;
+  }
 }
 
 server.listen(PORT, () => {
