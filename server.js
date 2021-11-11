@@ -16,6 +16,7 @@ usersReady = false;
 enemyHP = 0;
 encounterInProgress = false;
 gameRunning = false;
+validMessages = ["attack"];
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -87,13 +88,27 @@ io.on('connection', (socket) => {
         encounterInProgress = true;
       }
       if(encounterInProgress){
+        if (msg === "attack" && socket.id === currentPersonID){
+          console.log('attacked');
+          enemyHP -= 10;
+          console.log(enemyHP);
+        }
         if (enemyHP > 0){
-          currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
-          currentPerson = getCurrentUser(currentPersonID);
+          try{
+            if (socket.id === currentPersonID && validMessages.includes(msg)){
+              currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+              currentPerson = getCurrentUser(currentPersonID);
+            }
+          }
+          catch{
+            currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+            currentPerson = getCurrentUser(currentPersonID);
+          }
           io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username} what will you do?`));
         }
         else{
-          io.to(room).emit('chat message', formatMessage("server", `u won`));
+          io.to(room).emit('chat message', formatMessage("server", `You won! Type something to continue..`));
+          encounterInProgress = false;
         }
       }
     }
