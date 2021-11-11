@@ -1,6 +1,4 @@
-
 //isSkillOrCombat 1 - skill, 0 - combat
-isSkillOrCombat: 1}or
 
 randEnc1 = { name:"Gang Members Attack", description:"You've being jumped by gansters.  Roll initiative!" , 
                     isSkillOrCombat:0, enemyName: "Gansters", hp:50, minAttack: 10, maxAttack: 20}
@@ -32,7 +30,7 @@ randEnc6 = { name:"Looting from cars", description: "You walk past a car that lo
 
 randomEncounters = [ randEnc1, randEnc2, randEnc3, randEnc4, randEnc5, randEnc6 ]
 
-function randEncounter(randomEncounters) {
+function randEncounter() {
     randEncRoll = Math.floor(Math.random() * (randomEncounters.length))
     return randomEncounters[randEncRoll]
 }

@@ -141,7 +141,13 @@ function getRandomInt(max) {
 function gameSetup(room){
   encounter = randEncounter();
   io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
-  enemyHP = 30;
+  if (encounter.isSkillOrCombat == 0){
+    enemyHP = encounter.hp;
+    console.log('enemy hp ' + enemyHP);
+  }
+  else{
+    enemyHP = 1;
+  }
 }
 
 server.listen(PORT, () => {
