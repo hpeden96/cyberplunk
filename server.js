@@ -8,10 +8,14 @@ const path = require('path');
 const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users');
 const { randEncounter } = require('./utils/encounter');
 const { formatMessage } = require('./utils/messages');
+const e = require('cors');
 const PORT = process.env.PORT || 5000;
 
 const messageHistory = [];
 usersReady = false;
+enemyHP = 0;
+encounterInProgress = false;
+gameRunning = false;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -20,7 +24,7 @@ io.on('connection', (socket) => {
 
     socket.emit('previous messages', { messageHistory, room });
 
-    socket.emit('chat message', formatMessage('Server', 'Please enter your class'));
+    socket.emit('chat message', formatMessage('Server', 'Please enter your class and type "start" to start the game when everyone is ready'));
 
     const user = userJoin(socket.id, username, room, false, null, getRandomInt(100), null, 0);
 
@@ -32,29 +36,12 @@ io.on('connection', (socket) => {
     });
   })
 
-  socket.on('game started', (room) => {
-    //console.log(`game started in ${room}`);
-    roomUsers = getRoomUsers(room);
-    roomUsersIds = roomUsers.map(oof => oof.id);
-    //console.log(roomUsersIds);
-
-    usersReady = true;
-    roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
-    if(usersReady){
-      encounter = randEncounter();
-      io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
-
-      encounterRunning = true;
-      
-      if (encounterRunning){
-        thisPersonsTurn = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
-        console.log(thisPersonsTurn);
-      }
-    }
-  })
-
   socket.on('chat message', (msg) => {
+    const username = getCurrentUser(socket.id).username;
     const user = getCurrentUser(socket.id);
+    const room = getCurrentUser(socket.id).room;
+    // send out the message to room
+    io.to(room).emit('chat message', formatMessage(username, msg));
 
     if (!user.characterCreated){
       if(["solo", "medtech", "netrunner"].includes(msg.toLowerCase())){
@@ -76,12 +63,45 @@ io.on('connection', (socket) => {
       //console.log(user);
     }
 
-    if(usersReady){
-      console.log('users running');
+    // game logic
+    //
+    //console.log(`game started in ${room}`);
+
+    roomUsers = getRoomUsers(room);
+    roomUsersIds = roomUsers.map(oof => oof.id);
+    //console.log(roomUsersIds);
+
+    usersReady = true;
+    roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
+
+    if(msg === "start" && usersReady){
+      gameRunning = true;
+    }
+    else if (msg === "start" && !usersReady){
+        io.to(room).emit('chat message', formatMessage("server", `Someone in the room has not selected their class`));
     }
 
+    if(gameRunning){
+      if(!encounterInProgress){
+        gameSetup(room);
+        encounterInProgress = true;
+      }
+      if(encounterInProgress){
+        if (enemyHP > 0){
+          currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+          currentPerson = getCurrentUser(currentPersonID);
+          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username} what will you do?`));
+        }
+        else{
+          io.to(room).emit('chat message', formatMessage("server", `u won`));
+        }
+      }
+    }
+    //console.log(gameRunning);
+
+    // End game logic
+
     messageHistory.push({ ...formatMessage(user.username, msg), messageRoom: user.room })
-    io.to(user.room).emit('chat message', formatMessage(user.username, msg));
   });
 
   socket.on('disconnect', () => {
@@ -97,6 +117,12 @@ io.on('connection', (socket) => {
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
+}
+
+function gameSetup(room){
+  encounter = randEncounter();
+  io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
+  enemyHP = 30;
 }
 
 server.listen(PORT, () => {

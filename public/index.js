@@ -56,10 +56,6 @@ socket.on('roomUsers', ({ room, users }) => {
     userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
 })
 
-function startGame(){
-    socket.emit('game started', room);
-}
-
 function cringe(){
     bsOffCanvasMenu.toggle();
 }
