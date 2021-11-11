@@ -56,6 +56,18 @@ socket.on('roomUsers', ({ room, users }) => {
     userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
 })
 
+socket.on('userdata', ({ room, users }) => {
+    thisCharacter = null;
+    users.forEach(user => socket.id === user.id ? thisCharacter = user : {});
+    console.log(thisCharacter);
+
+    roomHeader.innerText = `Users In ${room}`;
+    roomHeaderOffcanvas.innerText = `Users In ${room}`;
+
+    userListOffcanvas.innerHTML=`${users.map(user => `<li class="userListItem">${user.username} (${user.health}/${user.maxhealth})</li>`).join('')}`;
+    userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username} (${user.health}/${user.maxhealth})</li>`).join('')}`;
+})
+
 function cringe(){
     bsOffCanvasMenu.toggle();
 }
