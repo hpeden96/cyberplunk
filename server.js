@@ -6,10 +6,17 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const path = require('path');
 const { userJoin, getCurrentUser, userLeave, getRoomUsers } = require('./utils/users');
+const { randEncounter } = require('./utils/encounter');
 const { formatMessage } = require('./utils/messages');
+const e = require('cors');
 const PORT = process.env.PORT || 5000;
 
 const messageHistory = [];
+usersReady = false;
+enemyHP = 0;
+encounterInProgress = false;
+gameRunning = false;
+validMessages = ["attack"];
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -18,9 +25,9 @@ io.on('connection', (socket) => {
 
     socket.emit('previous messages', { messageHistory, room });
 
-    socket.emit('startUserCreation');
-
-    const user = userJoin(socket.id, username, room, false, null, getRandomInt(100), null, 0);
+    socket.emit('chat message', formatMessage('Server', 'Please enter your class and type "start" to start the game when everyone is ready'));
+    healths = getRandomInt(100);
+    const user = userJoin(socket.id, username, room, false, null, healths, healths, null);
 
     socket.join(user.room);
 
@@ -31,30 +38,89 @@ io.on('connection', (socket) => {
   })
 
   socket.on('chat message', (msg) => {
+    const username = getCurrentUser(socket.id).username;
     const user = getCurrentUser(socket.id);
+    const room = getCurrentUser(socket.id).room;
+    // send out the message to room
+    io.to(room).emit('chat message', formatMessage(username, msg));
 
     if (!user.characterCreated){
       if(["solo", "medtech", "netrunner"].includes(msg.toLowerCase())){
         user.role = msg.toLowerCase();
         if (user.role === "solo"){
           user.health += 20;
-          user.unlockChance = 20
+          user.maxhealth += 20;
         }
         else if (user.role === "medtech"){
           user.health += 30;
-          user.unlockChance = 40
+          user.maxhealth += 30;
         }
         else if (user.role === "netrunner"){
           user.health += 10
-          user.unlockChance = 90
+          user.maxhealth += 10;
         }
         user.characterCreated = true;
       }
-      console.log(user);
+      //console.log(user);
     }
 
+    // game logic
+    //
+    //console.log(`game started in ${room}`);
+
+    roomUsers = getRoomUsers(room);
+    roomUsersIds = roomUsers.map(oof => oof.id);
+    //console.log(roomUsersIds);
+
+    usersReady = true;
+    roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
+
+    if(msg === "start" && usersReady){
+      io.to(room).emit('userdata', {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      });
+      gameRunning = true;
+    }
+    else if (msg === "start" && !usersReady){
+        io.to(room).emit('chat message', formatMessage("server", `Someone in the room has not selected their class`));
+    }
+
+    if(gameRunning){
+      if(!encounterInProgress){
+        gameSetup(room);
+        encounterInProgress = true;
+      }
+      if(encounterInProgress){
+        if (msg === "attack" && socket.id === currentPersonID){
+          console.log('attacked');
+          enemyHP -= 10;
+          console.log(enemyHP);
+        }
+        if (enemyHP > 0){
+          try{
+            if (socket.id === currentPersonID && validMessages.includes(msg)){
+              currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+              currentPerson = getCurrentUser(currentPersonID);
+            }
+          }
+          catch{
+            currentPersonID = roomUsersIds[Math.floor(Math.random() * roomUsersIds.length)];
+            currentPerson = getCurrentUser(currentPersonID);
+          }
+          io.to(room).emit('chat message', formatMessage("server", `${currentPerson.username} what will you do?`));
+        }
+        else{
+          io.to(room).emit('chat message', formatMessage("server", `You won! Type something to continue..`));
+          encounterInProgress = false;
+        }
+      }
+    }
+    //console.log(gameRunning);
+
+    // End game logic
+
     messageHistory.push({ ...formatMessage(user.username, msg), messageRoom: user.room })
-    io.to(user.room).emit('chat message', formatMessage(user.username, msg));
   });
 
   socket.on('disconnect', () => {
@@ -70,6 +136,12 @@ io.on('connection', (socket) => {
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
+}
+
+function gameSetup(room){
+  encounter = randEncounter();
+  io.to(room).emit('chat message', formatMessage(encounter.name, encounter.description));
+  enemyHP = 30;
 }
 
 server.listen(PORT, () => {

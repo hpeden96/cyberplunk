@@ -48,19 +48,24 @@ socket.on('previous messages', function(data) {
     });
 })
 
-socket.on('startUserCreation', () => {
-    var item = document.createElement('div');
-    item.classList.add('message');
-    item.innerHTML = `<p class="meta">Server</p><p class="text">Please enter your class</p>`;
-    document.getElementById("messages").appendChild(item);
-})
-
 socket.on('roomUsers', ({ room, users }) => {
     roomHeader.innerText = `Users In ${room}`;
     roomHeaderOffcanvas.innerText = `Users In ${room}`;
 
     userListOffcanvas.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
     userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username}</li>`).join('')}`;
+})
+
+socket.on('userdata', ({ room, users }) => {
+    thisCharacter = null;
+    users.forEach(user => socket.id === user.id ? thisCharacter = user : {});
+    console.log(thisCharacter);
+
+    roomHeader.innerText = `Users In ${room}`;
+    roomHeaderOffcanvas.innerText = `Users In ${room}`;
+
+    userListOffcanvas.innerHTML=`${users.map(user => `<li class="userListItem">${user.username} (${user.health}/${user.maxhealth})</li>`).join('')}`;
+    userList.innerHTML=`${users.map(user => `<li class="userListItem">${user.username} (${user.health}/${user.maxhealth})</li>`).join('')}`;
 })
 
 function cringe(){
