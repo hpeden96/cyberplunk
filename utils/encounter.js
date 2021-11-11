@@ -1,5 +1,4 @@
-
-//isSkillOrCombat 1 - skill challange, 0 - combat
+//isSkillOrCombat 1 - skill, 0 - combat
 
 randEnc1 = { name:"Gang Members Attack", description:"You've being jumped by gansters.  Roll initiative!" , 
                     isSkillOrCombat:0, enemyName: "Gansters", hp:50, minAttack: 10, maxAttack: 20}
