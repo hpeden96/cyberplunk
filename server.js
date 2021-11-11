@@ -76,7 +76,7 @@ io.on('connection', (socket) => {
     roomUsers.forEach(user => !user.characterCreated ? usersReady = false : {});
 
     if(msg === "start" && usersReady){
-      io.emit('userdata', {
+      io.to(room).emit('userdata', {
         room: user.room,
         users: getRoomUsers(user.room)
       });
